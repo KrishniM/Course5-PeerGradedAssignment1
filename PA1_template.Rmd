@@ -3,6 +3,7 @@ title: "Course 5-Peer Graded Assignment 1"
 author: "Krishni"
 date: "May 27, 2018"
 output: html_document
+keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -27,9 +28,11 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ### Sample Activity Data
 ```{r activity, echo=FALSE}
+
 library(ggplot2);
 library(plyr);
-setwd("C:\\Users\\kits\\Documents\\Development\\R\\Coursera\\Course5\\Assignment 1\\repdata%2Fdata%2Factivity")
+
+
 
 activity<-read.csv("activity.csv", header = TRUE);
 
@@ -47,7 +50,7 @@ head(activity_nonulls)
 ### What is mean total number of steps taken per day?
 
 **1 - Make a histogram of the total number of steps taken each day**
-```{r number of steps, echo = TRUE}
+```{r Figure_1, echo = TRUE}
 steps_per_day <- aggregate(steps ~ date, data = activity_nonulls, FUN = sum)
 colnames(steps_per_day)<- c("Date" , "Steps")
 
@@ -59,7 +62,7 @@ hist(steps_per_day$Steps, main = "Number of Steps Per Day" , xlab = "Number of S
 
 ### Mean number of steps  
 The mean number of steps is calculated as 
-```{r eval=FALSE}
+```{r mean number of steps, eval=FALSE}
 mean(steps_per_day$Steps)
 ```
 
@@ -83,7 +86,7 @@ median(steps_per_day$Steps)
 ### What is the average daily activity pattern?
 
 **1- Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)**
-```{r average daily activity pattern, echo=TRUE}
+```{r Figure_2, echo=TRUE}
 steps_per_interval <- aggregate(steps ~ interval, data = activity_nonulls, FUN = mean , na.rm = TRUE)
 
 plot (x = steps_per_interval$interval , y = steps_per_interval$steps, type = "l" , 
@@ -129,7 +132,7 @@ mergedData <- rbind(activity_nonulls, newdataFormat)
 ```
 
 ** 4 - Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?**
-```{r}
+```{r Figure_3}
 steps_per_day2 <- aggregate(steps ~ date, data = mergedData, FUN = sum)
 colnames(steps_per_day2)<- c("Date" , "Steps")
 
@@ -171,7 +174,7 @@ mergedData$DayType<- ifelse(mergedData$day %in% c("Saturday" , "Sunday"), "WeekE
 
 
 **2 - Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type="l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.**
-```{r}
+```{r Figure_4}
 steps_per_day_mean <- ddply(mergedData,.(interval,DayType),summarize, average = mean(steps))
 
 head(steps_per_day_mean)
