@@ -1,0 +1,184 @@
+---
+title: "Course 5-Peer Graded Assignment 1"
+author: "Krishni"
+date: "May 27, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is the report for the Reproducible Research Peer Graded Assignment 1. The details relating to the assignment are in [Readme.md](https://github.com/KrishniM/Course5-PeerGradedAssignment1/blob/master/README.md) file that has been included in the submitted github repository.
+
+## Data and Analysis
+**Dataset:** Activity monitoring data [52K]  
+
+The variables included in this dataset are:
+
+- **steps:** Number of steps taking in a 5-minute interval (missing values are coded as \color{red}{\verb|NA|}NA)
+- **date:** The date on which the measurement was taken in YYYY-MM-DD format
+- **interval:** Identifier for the 5-minute interval in which measurement was taken
+
+The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
+
+
+### Sample Activity Data
+
+```{r activity, echo=FALSE}
+library(ggplot2);
+library(plyr);
+setwd("C:\\Users\\kits\\Documents\\Development\\R\\Coursera\\Course5\\Assignment 1\\repdata%2Fdata%2Factivity")
+
+activity<-read.csv("activity.csv", header = TRUE);
+
+activity$day <- weekdays(as.Date(activity$date));
+
+activity$date <- as.Date(activity$date, "%Y-%m-%d")
+
+activity_nonulls <- activity[!is.na(activity$steps),]
+
+head(activity_nonulls)
+
+```
+
+
+### What is mean total number of steps taken per day?
+```{r number of steps, echo = TRUE}
+steps_per_day <- aggregate(steps ~ date, data = activity_nonulls, FUN = sum)
+colnames(steps_per_day)<- c("Date" , "Steps")
+
+hist(steps_per_day$Steps, main = "Number of Steps Per Day" , xlab = "Number of Steps", ylab = "Frequency" , col = "blue" ,breaks = 5)
+
+```
+
+### Mean number of steps  
+The mean number of steps is calculated as 
+```{r eval=FALSE}
+mean(steps_per_day$Steps)
+```
+
+**The average or mean number of steps taken each day was **
+```{r echo=FALSE}
+mean(steps_per_day$Steps)
+```
+
+### Median number of steps
+The median number of steps is calculated as 
+```{r eval=FALSE}
+median(steps_per_day$Steps)
+```
+
+**The median number of steps taken was ** 
+```{r echo=FALSE}
+median(steps_per_day$Steps)
+```
+
+
+### What is the average daily activity pattern?
+```{r average daily activity pattern, echo=TRUE}
+steps_per_interval <- aggregate(steps ~ interval, data = activity_nonulls, FUN = mean , na.rm = TRUE)
+
+plot (x = steps_per_interval$interval , y = steps_per_interval$steps, type = "l" , 
+      col = "red" ,
+      main = "Average number of steps per Interval",
+      xlab = 'Interval',
+      ylab = 'Average number of steps')
+```
+
+### Interval with maximum number of steps 
+Calculation :- 
+```{r eval = FALSE}
+steps_per_interval$interval[which.max(steps_per_interval$steps)]
+```
+
+**Interval with the maximum steps was**
+```{r echo = FALSE}
+steps_per_interval$interval[which.max(steps_per_interval$steps)]
+```
+
+
+### Imputing missing values
+**1 - Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with \color{red}{\verb|NA|}NAs)**
+```{r missing values, echo=TRUE}
+missing_values <- activity[ is.na(activity$steps),]
+
+numberofmissingvalues <- sum ( is.na(activity$steps))
+numberofmissingvalues
+```
+
+**2 - Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**
+```{r}
+newdata<-merge(missing_values,steps_per_interval,by= c("interval"))
+newdataFormat <- newdata[, c(5,3,1,4)]
+colnames(newdataFormat) <-c("steps" ,"date" ,"interval" ,"day")
+```
+
+**3 - Create a new dataset that is equal to the original dataset but with the missing data filled in.**
+The missing values will be set to average value for the interval
+```{r}
+mergedData <- rbind(activity_nonulls, newdataFormat)
+```
+
+** 4 - Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?**
+```{r}
+steps_per_day2 <- aggregate(steps ~ date, data = mergedData, FUN = sum)
+colnames(steps_per_day2)<- c("Date" , "Steps")
+
+hist(steps_per_day2$Steps, main = "Number of Steps Per Day" , xlab = "Number of Steps", ylab = "Frequency" , col = "blue" ,breaks = 5)
+
+summary(mergedData)
+summary(steps_per_day2)
+```
+
+### Mean number of steps  
+The mean number of steps is calculated as 
+```{r eval=FALSE}
+mean(steps_per_day2$Steps)
+```
+
+**The average or mean number of steps taken each day was **
+```{r echo=FALSE}
+mean(steps_per_day2$Steps)
+```
+
+### Median number of steps
+The median number of steps is calculated as 
+```{r eval=FALSE}
+median(steps_per_day2$Steps)
+```
+
+**The median number of steps taken was ** 
+```{r echo=FALSE}
+median(steps_per_day2$Steps)
+```
+
+
+### Are there differences in activity patterns between weekdays and weekends?
+
+**1 - Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.**
+```{r weekdays vs weekends, echo=TRUE}
+mergedData$DayType<- ifelse(mergedData$day %in% c("Saturday" , "Sunday"), "WeekEnd" , "WeekDay")
+
+mergedData
+
+```
+
+
+**Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type="l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.**
+```{r}
+
+```
+
+
+### Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
